@@ -6,6 +6,11 @@
 import React, { useState, useEffect } from 'react';
 import AnalysisView from './components/AnalysisView';
 import Papa from 'papaparse';
+import { Document, Page, pdfjs } from 'react-pdf';
+import 'react-pdf/dist/Page/AnnotationLayer.css';
+import 'react-pdf/dist/Page/TextLayer.css';
+
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 export type CatalogItem = {
   id: number;
@@ -76,6 +81,60 @@ const fetchGoogleSheetCsv = async (url: string) => {
   });
 };
 
+export const COLOR_CATALOG = [
+  {
+    category: 'Putih',
+    colors: ['Putih Netral', 'Putih Bluish', 'Broken White']
+  },
+  {
+    category: 'Muda',
+    colors: [
+       'Bubblegum Pink', 'Pastel Pink', 'Pink', 'Muted Pink', 'Baby Pink', 'Dusty Pink', 'Soft Peach', 'Woodrose', 'Peony Pink', 
+       'Dusty Peach', 'Salem', 'Baby Yellow', 'Butter', 'Light Brown', 'Beige', 'Cream', 'Light Latte', 'Champagne', 
+       'Safari', 'Seafoam Green', 'Tosca Muda', 'Hijau Mint', 'Harbor Green', 'Aqua Haze', 'Palladian Blue', 'Pastel Blue', 'Sky Blue', 
+       'Biru Muda', 'Turkis Muda', 'Lavender', 'Lilac', 'Dusty Lilac', 'Light Grey', 'Abu Muda'
+    ]
+  },
+  {
+    category: 'Sedang',
+    colors: [
+       'Blush Red', 'Salmon Red', 'Terracotta', 'Rustic Orchid', 'Dusty Rose', 'Old Gold', 'Orange', 'Kuning Mas', 'Bright Orange', 'Mustard', 'Kuning Kenari', 
+       'Kuning Lemon', 'Hijau Pucuk', 'Electric Lime', 'Honey', 'Dijon Yellow', 'Golden Lime', 'Almond Brown', 'Coklat Susu', 'Maple Brown', 'Khaki', 'Sage Green', 
+       'Olive Green', 'Ash Green', 'Forest Green', 'Mineral Green', 'Mineral Blue', 'Cameo Blue', 'Ash Blue', 'Steel Blue', 'Dusty Blue', 'Smoke Blue', 'Denim Blue', 
+       'Dark Lavender', 'Twilight Mauve', 'Dusty Violet', 'Vintage Violet', 'Pale Berry', 'Black Evo', 'Stone Grey', 'Abu Sedang'
+    ]
+  },
+  {
+    category: 'Tua',
+    colors: [
+       'Burgundy', 'Maroon', 'Merah Cabe', 'Fuchsia', 'Hijau Fuji', 'Hijau Botol', 'Tosca', 'Biru Tosca', 'Tosca Tua', 'Turkis', 'Turkis Tua', 'Deep Blue', 'Navy', 
+       'Ungu Tua', 'Magenta', 'Abu Tua', 'Coklat Kopi', 'Hijau TNI', 'Orange Bata', 'Hitam Reaktif', 'Army Green', 'Hijau Botol Special', 'Cactus Green', 'Autumn Orange', 
+       'Dark Mustard', 'Red Plum', 'Atlantic Sea', 'Stone Green', 'Royal Purple', 'Cinnamon', 'Toffee', 'Dark Olive', 'Ocean Blue', 'Light Navy', 'Pine Green', 'Jet Black Evo'
+    ]
+  },
+  {
+    category: 'Hitam & Special',
+    colors: [
+       'Smoke Black', 'Smoke Jet Black', 'Benhur Special', 'Hitam Sulfur', 'Jet Black'
+    ]
+  },
+  {
+    category: 'Misty',
+    colors: [
+       'Misty M71 Putih Bluish', 'Misty M71A Putih Bluish', 'Misty Sedang', 'Misty M71'
+    ]
+  }
+];
+
+export const TONE_MAPPING: Record<string, string[]> = {
+   'Putih': COLOR_CATALOG[0].colors,
+   'Muda': COLOR_CATALOG[1].colors,
+   'Sedang': COLOR_CATALOG[2].colors,
+   'Tua': COLOR_CATALOG[3].colors,
+   'Hitam & Special': COLOR_CATALOG[4].colors,
+   'Misty': COLOR_CATALOG[5].colors,
+};
+
 export default function App() {
   const [activeTab, setActiveTab] = useState('ALL');
   const [currentView, setCurrentView] = useState<'Katalog' | 'Analysis'>('Katalog');
@@ -86,43 +145,51 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [supplierFilter, setSupplierFilter] = useState('ALL');
   const [supplierSearchQuery, setSupplierSearchQuery] = useState('');
+  const [warnaFilter, setWarnaFilter] = useState('ALL');
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedProductDetails, setSelectedProductDetails] = useState<CatalogItem | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [isDesktopSearchOpen, setIsDesktopSearchOpen] = useState(false);
+  const [isCatalogModalOpen, setIsCatalogModalOpen] = useState(false);
+  const [numPages, setNumPages] = useState<number>();
+  const [pdfPageNumber, setPdfPageNumber] = useState(1);
+
+  function onDocumentLoadSuccess({ numPages }: { numPages: number }): void {
+    setNumPages(numPages);
+  }
+
+  const loadAllData = async () => {
+    setIsLoading(true);
+    let allData: CatalogItem[] = [];
+    let idCounter = 1;
+    
+    try {
+      const urls = [
+        { cat: 'ACC', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRkO9AGppPx9X2tghR_JV3EOHwqnd5nWCF3lMjMWGsA7-gc48NxPJ22Ip9JqepaxYeWaZO087hIErP4/pub?gid=1479260351&single=true&output=csv' },
+        { cat: 'WOVEN', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRkO9AGppPx9X2tghR_JV3EOHwqnd5nWCF3lMjMWGsA7-gc48NxPJ22Ip9JqepaxYeWaZO087hIErP4/pub?gid=0&single=true&output=csv' },
+        { cat: 'KNITT', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRkO9AGppPx9X2tghR_JV3EOHwqnd5nWCF3lMjMWGsA7-gc48NxPJ22Ip9JqepaxYeWaZO087hIErP4/pub?gid=1345552825&single=true&output=csv' },
+        { cat: 'ACC KNITT', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRkO9AGppPx9X2tghR_JV3EOHwqnd5nWCF3lMjMWGsA7-gc48NxPJ22Ip9JqepaxYeWaZO087hIErP4/pub?gid=852890249&single=true&output=csv' },
+        { cat: 'FOB', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRkO9AGppPx9X2tghR_JV3EOHwqnd5nWCF3lMjMWGsA7-gc48NxPJ22Ip9JqepaxYeWaZO087hIErP4/pub?gid=110465754&single=true&output=csv' },
+      ];
+      
+      for (const info of urls) {
+        const rows = await fetchGoogleSheetCsv(info.url);
+        const parsedRows = rows.map(r => normalizeItem(r, info.cat, idCounter++));
+        // Filter out rows that have no name
+        const validRows = parsedRows.filter(r => r.namaBarang && r.namaBarang !== 'Unknown' && r.namaBarang.trim() !== '');
+        allData = [...allData, ...validRows];
+      }
+      
+      setItems(allData);
+    } catch (e) {
+      console.error("Failed to load catalog data", e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    async function loadAllData() {
-      setIsLoading(true);
-      let allData: CatalogItem[] = [];
-      let idCounter = 1;
-      
-      try {
-        const urls = [
-          { cat: 'ACC', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRkO9AGppPx9X2tghR_JV3EOHwqnd5nWCF3lMjMWGsA7-gc48NxPJ22Ip9JqepaxYeWaZO087hIErP4/pub?gid=1479260351&single=true&output=csv' },
-          { cat: 'WOVEN', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRkO9AGppPx9X2tghR_JV3EOHwqnd5nWCF3lMjMWGsA7-gc48NxPJ22Ip9JqepaxYeWaZO087hIErP4/pub?gid=0&single=true&output=csv' },
-          { cat: 'KNITT', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRkO9AGppPx9X2tghR_JV3EOHwqnd5nWCF3lMjMWGsA7-gc48NxPJ22Ip9JqepaxYeWaZO087hIErP4/pub?gid=1345552825&single=true&output=csv' },
-          { cat: 'ACC KNITT', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRkO9AGppPx9X2tghR_JV3EOHwqnd5nWCF3lMjMWGsA7-gc48NxPJ22Ip9JqepaxYeWaZO087hIErP4/pub?gid=852890249&single=true&output=csv' },
-          { cat: 'FOB', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRkO9AGppPx9X2tghR_JV3EOHwqnd5nWCF3lMjMWGsA7-gc48NxPJ22Ip9JqepaxYeWaZO087hIErP4/pub?gid=110465754&single=true&output=csv' },
-        ];
-        
-        for (const info of urls) {
-          const rows = await fetchGoogleSheetCsv(info.url);
-          const parsedRows = rows.map(r => normalizeItem(r, info.cat, idCounter++));
-          // Filter out rows that have no name
-          const validRows = parsedRows.filter(r => r.namaBarang && r.namaBarang !== 'Unknown' && r.namaBarang.trim() !== '');
-          allData = [...allData, ...validRows];
-        }
-        
-        setItems(allData);
-      } catch (e) {
-        console.error("Failed to load catalog data", e);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    
     loadAllData();
   }, []);
 
@@ -130,6 +197,17 @@ export default function App() {
   const filteredItems = items.filter(item => {
     if (activeTab !== 'ALL' && item.kategori !== activeTab) return false;
     if (supplierFilter !== 'ALL' && item.supplier !== supplierFilter) return false;
+    
+    if (warnaFilter !== 'ALL') {
+       const mappedColors = TONE_MAPPING[warnaFilter] || [];
+       if (mappedColors.length > 0) {
+           const match = mappedColors.some(c => item.namaBarang.toLowerCase().includes(c.toLowerCase()));
+           if (!match) return false;
+       } else {
+           if (!item.namaBarang.toLowerCase().includes(warnaFilter.toLowerCase())) return false;
+       }
+    }
+
     if (searchQuery) {
        const q = searchQuery.toLowerCase();
        return item.namaBarang.toLowerCase().includes(q) || item.supplier.toLowerCase().includes(q);
@@ -147,6 +225,7 @@ export default function App() {
   const setTabAndReset = (tab: string) => {
     setActiveTab(tab);
     setSupplierFilter('ALL');
+    setWarnaFilter('ALL');
     setCurrentPage(1);
   };
 
@@ -308,6 +387,12 @@ export default function App() {
                     </button>
                  ))}
               </div>
+
+              <h3 className="font-label text-xs text-on-surface-variant font-semibold uppercase tracking-widest mt-8 mb-4">Kategori Warna</h3>
+              <button onClick={() => setIsCatalogModalOpen(true)} className="w-full text-center mt-2 font-body text-xs font-semibold text-primary hover:text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors py-2 rounded-lg shadow-sm border border-blue-100">
+                <span className="material-symbols-outlined text-[14px] align-middle mr-1">menu_book</span>
+                Lihat Katalog Warna
+              </button>
          </div>
    </div>
 </div>
@@ -352,6 +437,12 @@ export default function App() {
                     </button>
                  ))}
               </div>
+
+              <h3 className="font-label text-xs text-on-surface-variant font-semibold uppercase tracking-widest mt-8 mb-4">Kategori Warna</h3>
+              <button onClick={() => setIsCatalogModalOpen(true)} className="w-full text-center mt-2 font-body text-xs font-semibold text-primary hover:text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors py-2 rounded-lg shadow-sm border border-blue-100">
+                <span className="material-symbols-outlined text-[14px] align-middle mr-1">menu_book</span>
+                Lihat Katalog Warna
+              </button>
            </div>
            </aside>
         
@@ -371,11 +462,8 @@ export default function App() {
                  <p className="font-body text-on-surface-variant text-lg">Database Price Bahan Baku</p>
               </div>
               <div className="flex gap-2">
-                 <button className="flex items-center gap-2 bg-surface-container-lowest border border-outline-variant/30 text-on-surface font-body text-sm font-medium py-2 px-4 rounded-lg hover:bg-surface-variant transition-colors shadow-sm">
-                    <span className="material-symbols-outlined text-[18px]">refresh</span> Refresh
-                 </button>
-                 <button className="flex items-center justify-center bg-surface-container-lowest border border-outline-variant/30 text-on-surface py-2 px-3 rounded-lg hover:bg-surface-variant transition-colors shadow-sm">
-                    <span className="material-symbols-outlined text-[18px]">open_in_new</span>
+                 <button onClick={loadAllData} className="flex items-center gap-2 bg-surface-container-lowest border border-outline-variant/30 text-on-surface font-body text-sm font-medium py-2 px-4 rounded-lg hover:bg-surface-variant transition-colors shadow-sm">
+                    <span className={`material-symbols-outlined text-[18px] ${isLoading ? 'animate-spin' : ''}`}>refresh</span> Refresh
                  </button>
               </div>
            </div>
@@ -527,6 +615,77 @@ export default function App() {
           </div>
         </div>
       )}
+
+      {/* Catalog Modal */}
+      {isCatalogModalOpen && (
+        <div className="fixed inset-0 z-[300] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={() => setIsCatalogModalOpen(false)}></div>
+          <div className="relative bg-surface w-full max-w-5xl max-h-[95vh] flex flex-col rounded-[24px] shadow-2xl animate-in fade-in zoom-in-95 duration-200 border border-white/20">
+            
+            <div className="flex flex-shrink-0 items-center justify-between p-4 sm:p-6 border-b border-outline-variant/40 bg-surface-container-lowest rounded-t-[24px]">
+              <div>
+                <h3 className="font-headline text-xl sm:text-2xl font-bold text-on-surface">Katalog Warna</h3>
+              </div>
+              <button onClick={() => setIsCatalogModalOpen(false)} className="text-on-surface-variant hover:text-error transition-colors p-2 bg-surface-container hover:bg-error/10 rounded-full flex items-center justify-center">
+                 <span className="material-symbols-outlined text-[20px]">close</span>
+              </button>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 custom-scrollbar bg-surface-container-lowest rounded-b-[24px]">
+               <div className="w-full h-full min-h-[60vh] rounded-xl overflow-hidden border border-outline-variant/20 flex flex-col items-center bg-gray-100 relative">
+                 <div className="absolute top-4 z-10 flex items-center gap-4 bg-white/90 backdrop-blur px-4 py-2 rounded-full shadow-md border border-gray-200">
+                    <button 
+                      disabled={pdfPageNumber <= 1}
+                      onClick={() => setPdfPageNumber(prev => Math.max(prev - 1, 1))}
+                      className="p-1 rounded-full hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <span className="material-symbols-outlined">chevron_left</span>
+                    </button>
+                    <span className="font-body text-sm font-semibold">
+                      Page {pdfPageNumber} of {numPages || '--'}
+                    </span>
+                    <button 
+                      disabled={pdfPageNumber >= (numPages || 1)}
+                      onClick={() => setPdfPageNumber(prev => Math.min(prev + 1, numPages || 1))}
+                      className="p-1 rounded-full hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <span className="material-symbols-outlined">chevron_right</span>
+                    </button>
+                 </div>
+                 
+                 <div className="w-full flex justify-center py-16">
+                   <Document
+                     file="/katalog-warna.pdf"
+                     onLoadSuccess={onDocumentLoadSuccess}
+                     loading={
+                       <div className="flex flex-col items-center justify-center py-20 text-on-surface-variant">
+                         <span className="material-symbols-outlined animate-spin text-4xl mb-4 text-primary">progress_activity</span>
+                         <p className="font-body text-sm">Memuat dokumen PDF...</p>
+                       </div>
+                     }
+                     error={
+                       <div className="flex flex-col items-center justify-center py-20 text-error">
+                         <span className="material-symbols-outlined text-4xl mb-4">error</span>
+                         <p className="font-body text-sm font-semibold">Gagal memuat PDF</p>
+                         <p className="font-body text-xs text-on-surface-variant mt-2 text-center">Pastikan ukuran file mendukung dan tidak rusak.</p>
+                       </div>
+                     }
+                   >
+                     <Page 
+                       pageNumber={pdfPageNumber} 
+                       renderTextLayer={false}
+                       renderAnnotationLayer={false}
+                       className="shadow-md rounded-lg overflow-hidden" 
+                       width={Math.min(window.innerWidth - 64, 800)}
+                     />
+                   </Document>
+                 </div>
+               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
