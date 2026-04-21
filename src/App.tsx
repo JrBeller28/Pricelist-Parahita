@@ -103,6 +103,7 @@ export default function App() {
           { cat: 'ACC', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRkO9AGppPx9X2tghR_JV3EOHwqnd5nWCF3lMjMWGsA7-gc48NxPJ22Ip9JqepaxYeWaZO087hIErP4/pub?gid=1479260351&single=true&output=csv' },
           { cat: 'WOVEN', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRkO9AGppPx9X2tghR_JV3EOHwqnd5nWCF3lMjMWGsA7-gc48NxPJ22Ip9JqepaxYeWaZO087hIErP4/pub?gid=0&single=true&output=csv' },
           { cat: 'KNITT', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRkO9AGppPx9X2tghR_JV3EOHwqnd5nWCF3lMjMWGsA7-gc48NxPJ22Ip9JqepaxYeWaZO087hIErP4/pub?gid=1345552825&single=true&output=csv' },
+          { cat: 'ACC KNITT', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRkO9AGppPx9X2tghR_JV3EOHwqnd5nWCF3lMjMWGsA7-gc48NxPJ22Ip9JqepaxYeWaZO087hIErP4/pub?gid=852890249&single=true&output=csv' },
           { cat: 'FOB', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRkO9AGppPx9X2tghR_JV3EOHwqnd5nWCF3lMjMWGsA7-gc48NxPJ22Ip9JqepaxYeWaZO087hIErP4/pub?gid=110465754&single=true&output=csv' },
         ];
         
@@ -281,7 +282,7 @@ export default function App() {
                  <h2 className="font-headline text-sm text-on-surface font-semibold tracking-widest uppercase">Menu Pricelist Bahan Baku</h2>
               </div>
               <div className="space-y-1 mb-8">
-                 {['ALL', 'ACC', 'WOVEN', 'KNITT', 'FOB'].map(cat => (
+                 {['ALL', 'ACC', 'WOVEN', 'KNITT', 'ACC KNITT', 'FOB'].map(cat => (
                    <button 
                      key={cat} 
                      onClick={() => setTabAndReset(cat)}
@@ -325,7 +326,7 @@ export default function App() {
                  <h2 className="font-headline text-sm text-on-surface font-semibold tracking-widest uppercase">Menu Pricelist Bahan Baku</h2>
               </div>
               <div className="space-y-1 mb-8">
-                 {['ALL', 'ACC', 'WOVEN', 'KNITT', 'FOB'].map(cat => (
+                 {['ALL', 'ACC', 'WOVEN', 'KNITT', 'ACC KNITT', 'FOB'].map(cat => (
                    <button 
                      key={cat} 
                      onClick={() => setTabAndReset(cat)}
