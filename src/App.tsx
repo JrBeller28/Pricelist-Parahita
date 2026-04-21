@@ -655,7 +655,7 @@ export default function App() {
                  
                  <div className="w-full flex justify-center py-16">
                    <Document
-                     file="/katalog-warna.pdf"
+                     file="/Price list Jakarta-pages.pdf"
                      onLoadSuccess={onDocumentLoadSuccess}
                      loading={
                        <div className="flex flex-col items-center justify-center py-20 text-on-surface-variant">
