@@ -1,0 +1,79 @@
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
+
+@import "tailwindcss";
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+  .pt-safe { padding-top: env(safe-area-inset-top); }
+}
+
+@theme {
+  --font-headline: "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Helvetica Neue", Arial, sans-serif;
+  --font-label: "Helvetica Neue", Arial, sans-serif;
+
+  /* BACKGROUND (putih tapi soft) */
+  --color-background: #f8fafc;
+  --color-surface: #ffffff;
+  --color-surface-variant: #f1f5f9;
+  
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f8fafc;
+  --color-surface-container: #f1f5f9;
+  --color-surface-container-high: #ffffff;
+  --color-surface-container-highest: #eef2ff;
+
+  /* TEXT */
+  --color-on-background: #0f172a;
+  --color-on-surface: #0f172a;
+  --color-on-surface-variant: #64748b;
+
+  /* BORDER */
+  --color-outline: #cbd5f5;
+  --color-outline-variant: #e2e8f0;
+
+  /* 🔥 PRIMARY (biru elegan, bukan norak) */
+  --color-primary: #2563eb; /* blue-600 */
+  --color-on-primary: #ffffff;
+
+  --color-primary-container: #dbeafe;
+  --color-on-primary-container: #1e40af;
+
+  /* SECONDARY */
+  --color-secondary: #f8fafc;
+  --color-on-secondary: #475569;
+  --color-secondary-container: #ffffff;
+  --color-on-secondary-container: #0f172a;
+
+  /* ACCENT (biru muda halus) */
+  --color-tertiary: #eff6ff;
+  --color-on-tertiary: #1d4ed8;
+  --color-tertiary-container: #1d4ed8;
+  --color-on-tertiary-container: #eff6ff;
+
+  /* RADIUS */
+  --radius-xl: 24px;
+  --radius-lg: 14px;
+  --radius-md: 10px;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-on-background);
+  font-family: var(--font-body);
+}
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.material-symbols-outlined[data-weight="fill"] {
+  font-variation-settings: 'FILL' 1;
+}
