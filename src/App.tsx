@@ -703,73 +703,84 @@ export default function App() {
 
       {/* Zipper Catalog Modal */}
       {isZipperModalOpen && (
-        <div className="fixed inset-0 z-[300] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={() => setIsZipperModalOpen(false)}></div>
-          <div className="relative bg-surface w-full max-w-5xl max-h-[95vh] flex flex-col rounded-[24px] shadow-2xl animate-in fade-in zoom-in-95 duration-200 border border-white/20">
-            
-            <div className="flex flex-shrink-0 items-center justify-between p-4 sm:p-6 border-b border-outline-variant/40 bg-surface-container-lowest rounded-t-[24px]">
-              <div>
-                <h3 className="font-headline text-xl sm:text-2xl font-bold text-on-surface">Katalog Aksesories</h3>
+          <div className="fixed inset-0 z-[300] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={() => setIsZipperModalOpen(false)}></div>
+            <div className="relative bg-surface w-full max-w-5xl max-h-[95vh] flex flex-col rounded-[24px] shadow-2xl animate-in fade-in zoom-in-95 duration-200 border border-white/20">
+              
+              {/* Header Modal */}
+              <div className="flex flex-shrink-0 items-center justify-between p-4 sm:p-6 border-b border-outline-variant/40 bg-surface-container-lowest rounded-t-[24px]">
+                <div>
+                  <h3 className="font-headline text-xl sm:text-2xl font-bold text-on-surface">Katalog Aksesories</h3>
+                </div>
+                <button onClick={() => setIsZipperModalOpen(false)} className="text-on-surface-variant hover:text-error transition-colors p-2 bg-surface-container hover:bg-error/10 rounded-full flex items-center justify-center">
+                  <span className="material-symbols-outlined text-[20px]">close</span>
+                </button>
               </div>
-              <button onClick={() => setIsZipperModalOpen(false)} className="text-on-surface-variant hover:text-error transition-colors p-2 bg-surface-container hover:bg-error/10 rounded-full flex items-center justify-center">
-                 <span className="material-symbols-outlined text-[20px]">close</span>
-              </button>
-            </div>
-            
-            <div className="flex-1 overflow-y-auto p-4 sm:p-6 custom-scrollbar bg-surface-container-lowest rounded-b-[24px]">
-               <div className="w-full h-full min-h-[60vh] rounded-xl overflow-hidden border border-outline-variant/20 flex flex-col items-center bg-gray-100 relative">
-                 <div className="absolute top-4 z-10 flex items-center gap-4 bg-white/90 backdrop-blur px-4 py-2 rounded-full shadow-md border border-gray-200">
-                    <button 
-                      disabled={zipperPdfPageNumber <= 1}
-                      onClick={() => setZipperPdfPageNumber(prev => Math.max(prev - 1, 1))}
-                      className="p-1 rounded-full hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              
+              {/* Konten PDF */}
+              <div className="flex-1 overflow-y-auto p-4 sm:p-6 custom-scrollbar bg-surface-container-lowest rounded-b-[24px]">
+                <div className="w-full h-full min-h-[60vh] rounded-xl overflow-hidden border border-outline-variant/20 flex flex-col items-center bg-gray-100 relative group">
+                  
+                  {/* Tombol Slide Kiri */}
+                  <button 
+                    disabled={zipperPdfPageNumber <= 1}
+                    onClick={() => setZipperPdfPageNumber(prev => Math.max(prev - 1, 1))}
+                    className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-20 p-2 sm:p-3 bg-white/90 backdrop-blur-sm rounded-full shadow-lg border border-gray-200 hover:bg-white hover:scale-105 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                  >
+                    <span className="material-symbols-outlined text-xl sm:text-2xl">chevron_left</span>
+                  </button>
+        
+                  {/* Tombol Slide Kanan */}
+                  <button 
+                    disabled={zipperPdfPageNumber >= (zipperNumPages || 1)}
+                    onClick={() => setZipperPdfPageNumber(prev => Math.min(prev + 1, zipperNumPages || 1))}
+                    className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-20 p-2 sm:p-3 bg-white/90 backdrop-blur-sm rounded-full shadow-lg border border-gray-200 hover:bg-white hover:scale-105 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                  >
+                    <span className="material-symbols-outlined text-xl sm:text-2xl">chevron_right</span>
+                  </button>
+                  
+                  {/* Dokumen PDF Container */}
+                  <div className="w-full flex-1 flex justify-center items-center py-10 px-12 sm:px-20">
+                    <Document
+                      file="/kategori zipper.pdf"
+                      onLoadSuccess={onZipperDocumentLoadSuccess}
+                      loading={
+                        <div className="flex flex-col items-center justify-center py-20 text-on-surface-variant">
+                          <span className="material-symbols-outlined animate-spin text-4xl mb-4 text-purple-600">progress_activity</span>
+                          <p className="font-body text-sm">Memuat dokumen PDF...</p>
+                        </div>
+                      }
+                      error={
+                        <div className="flex flex-col items-center justify-center py-20 text-error">
+                          <span className="material-symbols-outlined text-4xl mb-4">error</span>
+                          <p className="font-body text-sm font-semibold">Gagal memuat PDF</p>
+                          <p className="font-body text-xs text-on-surface-variant mt-2 text-center">Pastikan ada file "kategori zipper.pdf" di folder public.</p>
+                        </div>
+                      }
                     >
-                      <span className="material-symbols-outlined">chevron_left</span>
-                    </button>
-                    <span className="font-body text-sm font-semibold">
+                      <Page 
+                        pageNumber={zipperPdfPageNumber} 
+                        renderTextLayer={false}
+                        renderAnnotationLayer={false}
+                        className="shadow-xl rounded-lg overflow-hidden transition-opacity duration-300" 
+                        // Mengurangi 120px untuk memberikan ruang ekstra agar tombol tidak menutupi PDF
+                        width={Math.min(window.innerWidth - 120, 800)} 
+                      />
+                    </Document>
+                  </div>
+        
+                  {/* Indikator Halaman (Tengah Bawah) */}
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex items-center bg-white/90 backdrop-blur-sm px-6 py-2 rounded-full shadow-md border border-gray-200">
+                    <span className="font-body text-sm font-semibold text-gray-700">
                       Page {zipperPdfPageNumber} of {zipperNumPages || '--'}
                     </span>
-                    <button 
-                      disabled={zipperPdfPageNumber >= (zipperNumPages || 1)}
-                      onClick={() => setZipperPdfPageNumber(prev => Math.min(prev + 1, zipperNumPages || 1))}
-                      className="p-1 rounded-full hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                    >
-                      <span className="material-symbols-outlined">chevron_right</span>
-                    </button>
-                 </div>
-                 
-                 <div className="w-full flex justify-center py-16">
-                   <Document
-                     file="/kategori zipper.pdf"
-                     onLoadSuccess={onZipperDocumentLoadSuccess}
-                     loading={
-                       <div className="flex flex-col items-center justify-center py-20 text-on-surface-variant">
-                         <span className="material-symbols-outlined animate-spin text-4xl mb-4 text-purple-600">progress_activity</span>
-                         <p className="font-body text-sm">Memuat dokumen PDF...</p>
-                       </div>
-                     }
-                     error={
-                       <div className="flex flex-col items-center justify-center py-20 text-error">
-                         <span className="material-symbols-outlined text-4xl mb-4">error</span>
-                         <p className="font-body text-sm font-semibold">Gagal memuat PDF</p>
-                         <p className="font-body text-xs text-on-surface-variant mt-2 text-center">Pastikan ada file "kategori zipper.pdf" di folder public.</p>
-                       </div>
-                     }
-                   >
-                     <Page 
-                       pageNumber={zipperPdfPageNumber} 
-                       renderTextLayer={false}
-                       renderAnnotationLayer={false}
-                       className="shadow-md rounded-lg overflow-hidden" 
-                       width={Math.min(window.innerWidth - 64, 800)}
-                     />
-                   </Document>
-                 </div>
-               </div>
+                  </div>
+        
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
     </div>
   );
