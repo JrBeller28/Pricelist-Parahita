@@ -152,11 +152,18 @@ export default function App() {
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [isDesktopSearchOpen, setIsDesktopSearchOpen] = useState(false);
   const [isCatalogModalOpen, setIsCatalogModalOpen] = useState(false);
+  const [isZipperModalOpen, setIsZipperModalOpen] = useState(false);
   const [numPages, setNumPages] = useState<number>();
   const [pdfPageNumber, setPdfPageNumber] = useState(1);
+  const [zipperNumPages, setZipperNumPages] = useState<number>();
+  const [zipperPdfPageNumber, setZipperPdfPageNumber] = useState(1);
 
   function onDocumentLoadSuccess({ numPages }: { numPages: number }): void {
     setNumPages(numPages);
+  }
+
+  function onZipperDocumentLoadSuccess({ numPages }: { numPages: number }): void {
+    setZipperNumPages(numPages);
   }
 
   const loadAllData = async () => {
@@ -388,10 +395,14 @@ export default function App() {
                  ))}
               </div>
 
-              <h3 className="font-label text-xs text-on-surface-variant font-semibold uppercase tracking-widest mt-8 mb-4">Kategori Warna</h3>
-              <button onClick={() => setIsCatalogModalOpen(true)} className="w-full text-center mt-2 font-body text-xs font-semibold text-primary hover:text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors py-2 rounded-lg shadow-sm border border-blue-100">
+              <h3 className="font-label text-xs text-on-surface-variant font-semibold uppercase tracking-widest mt-8 mb-4">Katalog</h3>
+              <button onClick={() => setIsCatalogModalOpen(true)} className="w-full text-center mt-2 font-body text-xs font-semibold text-primary hover:text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors py-2 rounded-lg shadow-sm border border-blue-100 mb-2">
                 <span className="material-symbols-outlined text-[14px] align-middle mr-1">menu_book</span>
                 Lihat Katalog Warna
+              </button>
+              <button onClick={() => setIsZipperModalOpen(true)} className="w-full text-center font-body text-xs font-semibold text-purple-700 hover:text-purple-800 bg-purple-50 hover:bg-purple-100 transition-colors py-2 rounded-lg shadow-sm border border-purple-100">
+                <span className="material-symbols-outlined text-[14px] align-middle mr-1">style</span>
+                Lihat Katalog Zipper
               </button>
          </div>
    </div>
@@ -438,10 +449,14 @@ export default function App() {
                  ))}
               </div>
 
-              <h3 className="font-label text-xs text-on-surface-variant font-semibold uppercase tracking-widest mt-8 mb-4">Kategori Warna</h3>
-              <button onClick={() => setIsCatalogModalOpen(true)} className="w-full text-center mt-2 font-body text-xs font-semibold text-primary hover:text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors py-2 rounded-lg shadow-sm border border-blue-100">
+              <h3 className="font-label text-xs text-on-surface-variant font-semibold uppercase tracking-widest mt-8 mb-4">Katalog</h3>
+              <button onClick={() => setIsCatalogModalOpen(true)} className="w-full text-center mt-2 font-body text-xs font-semibold text-primary hover:text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors py-2 rounded-lg shadow-sm border border-blue-100 mb-2">
                 <span className="material-symbols-outlined text-[14px] align-middle mr-1">menu_book</span>
                 Lihat Katalog Warna
+              </button>
+              <button onClick={() => setIsZipperModalOpen(true)} className="w-full text-center font-body text-xs font-semibold text-purple-700 hover:text-purple-800 bg-purple-50 hover:bg-purple-100 transition-colors py-2 rounded-lg shadow-sm border border-purple-100">
+                <span className="material-symbols-outlined text-[14px] align-middle mr-1">style</span>
+                Lihat Katalog Zipper
               </button>
            </div>
            </aside>
@@ -655,7 +670,7 @@ export default function App() {
                  
                  <div className="w-full flex justify-center py-16">
                    <Document
-                     file="/Price list Jakarta-pages.pdf"
+                     file="/katalog-warna.pdf"
                      onLoadSuccess={onDocumentLoadSuccess}
                      loading={
                        <div className="flex flex-col items-center justify-center py-20 text-on-surface-variant">
@@ -673,6 +688,76 @@ export default function App() {
                    >
                      <Page 
                        pageNumber={pdfPageNumber} 
+                       renderTextLayer={false}
+                       renderAnnotationLayer={false}
+                       className="shadow-md rounded-lg overflow-hidden" 
+                       width={Math.min(window.innerWidth - 64, 800)}
+                     />
+                   </Document>
+                 </div>
+               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Zipper Catalog Modal */}
+      {isZipperModalOpen && (
+        <div className="fixed inset-0 z-[300] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={() => setIsZipperModalOpen(false)}></div>
+          <div className="relative bg-surface w-full max-w-5xl max-h-[95vh] flex flex-col rounded-[24px] shadow-2xl animate-in fade-in zoom-in-95 duration-200 border border-white/20">
+            
+            <div className="flex flex-shrink-0 items-center justify-between p-4 sm:p-6 border-b border-outline-variant/40 bg-surface-container-lowest rounded-t-[24px]">
+              <div>
+                <h3 className="font-headline text-xl sm:text-2xl font-bold text-on-surface">Katalog Zipper</h3>
+              </div>
+              <button onClick={() => setIsZipperModalOpen(false)} className="text-on-surface-variant hover:text-error transition-colors p-2 bg-surface-container hover:bg-error/10 rounded-full flex items-center justify-center">
+                 <span className="material-symbols-outlined text-[20px]">close</span>
+              </button>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 custom-scrollbar bg-surface-container-lowest rounded-b-[24px]">
+               <div className="w-full h-full min-h-[60vh] rounded-xl overflow-hidden border border-outline-variant/20 flex flex-col items-center bg-gray-100 relative">
+                 <div className="absolute top-4 z-10 flex items-center gap-4 bg-white/90 backdrop-blur px-4 py-2 rounded-full shadow-md border border-gray-200">
+                    <button 
+                      disabled={zipperPdfPageNumber <= 1}
+                      onClick={() => setZipperPdfPageNumber(prev => Math.max(prev - 1, 1))}
+                      className="p-1 rounded-full hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <span className="material-symbols-outlined">chevron_left</span>
+                    </button>
+                    <span className="font-body text-sm font-semibold">
+                      Page {zipperPdfPageNumber} of {zipperNumPages || '--'}
+                    </span>
+                    <button 
+                      disabled={zipperPdfPageNumber >= (zipperNumPages || 1)}
+                      onClick={() => setZipperPdfPageNumber(prev => Math.min(prev + 1, zipperNumPages || 1))}
+                      className="p-1 rounded-full hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <span className="material-symbols-outlined">chevron_right</span>
+                    </button>
+                 </div>
+                 
+                 <div className="w-full flex justify-center py-16">
+                   <Document
+                     file="/kategori zipper.pdf"
+                     onLoadSuccess={onZipperDocumentLoadSuccess}
+                     loading={
+                       <div className="flex flex-col items-center justify-center py-20 text-on-surface-variant">
+                         <span className="material-symbols-outlined animate-spin text-4xl mb-4 text-purple-600">progress_activity</span>
+                         <p className="font-body text-sm">Memuat dokumen PDF...</p>
+                       </div>
+                     }
+                     error={
+                       <div className="flex flex-col items-center justify-center py-20 text-error">
+                         <span className="material-symbols-outlined text-4xl mb-4">error</span>
+                         <p className="font-body text-sm font-semibold">Gagal memuat PDF</p>
+                         <p className="font-body text-xs text-on-surface-variant mt-2 text-center">Pastikan ada file "kategori zipper.pdf" di folder public.</p>
+                       </div>
+                     }
+                   >
+                     <Page 
+                       pageNumber={zipperPdfPageNumber} 
                        renderTextLayer={false}
                        renderAnnotationLayer={false}
                        className="shadow-md rounded-lg overflow-hidden" 
