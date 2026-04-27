@@ -402,7 +402,7 @@ export default function App() {
               </button>
               <button onClick={() => setIsZipperModalOpen(true)} className="w-full text-center font-body text-xs font-semibold text-purple-700 hover:text-purple-800 bg-purple-50 hover:bg-purple-100 transition-colors py-2 rounded-lg shadow-sm border border-purple-100">
                 <span className="material-symbols-outlined text-[14px] align-middle mr-1">style</span>
-                Lihat Katalog Zipper
+                Lihat Katalog Aksesories
               </button>
          </div>
    </div>
