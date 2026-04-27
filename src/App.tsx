@@ -456,7 +456,7 @@ export default function App() {
               </button>
               <button onClick={() => setIsZipperModalOpen(true)} className="w-full text-center font-body text-xs font-semibold text-purple-700 hover:text-purple-800 bg-purple-50 hover:bg-purple-100 transition-colors py-2 rounded-lg shadow-sm border border-purple-100">
                 <span className="material-symbols-outlined text-[14px] align-middle mr-1">style</span>
-                Lihat Katalog Zipper
+                Lihat Katalog Aksesories
               </button>
            </div>
            </aside>
@@ -709,7 +709,7 @@ export default function App() {
             
             <div className="flex flex-shrink-0 items-center justify-between p-4 sm:p-6 border-b border-outline-variant/40 bg-surface-container-lowest rounded-t-[24px]">
               <div>
-                <h3 className="font-headline text-xl sm:text-2xl font-bold text-on-surface">Katalog Zipper</h3>
+                <h3 className="font-headline text-xl sm:text-2xl font-bold text-on-surface">Katalog Aksesories</h3>
               </div>
               <button onClick={() => setIsZipperModalOpen(false)} className="text-on-surface-variant hover:text-error transition-colors p-2 bg-surface-container hover:bg-error/10 rounded-full flex items-center justify-center">
                  <span className="material-symbols-outlined text-[20px]">close</span>
