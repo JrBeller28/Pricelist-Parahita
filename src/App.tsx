@@ -244,7 +244,7 @@ export default function App() {
   {/* LEFT: LOGO */}
   <div className="flex items-center">
     <img 
-      src="https://www.seragamparahita.com/wp-content/uploads/2018/05/WhatsApp-Image-2018-05-20-at-10.01.28-PM.png" 
+      src="/logo.png" 
       alt="Parahita Prima Sentosa Logo" 
       className="h-12 w-auto object-contain"
       referrerPolicy="no-referrer"
@@ -328,7 +328,7 @@ export default function App() {
 
       {/* CENTER: LOGO */}
       <img 
-        src="https://www.seragamparahita.com/wp-content/uploads/2018/05/WhatsApp-Image-2018-05-20-at-10.01.28-PM.png"
+        src="/logo.png"
         className="h-10"
         alt="Logo"
       />
