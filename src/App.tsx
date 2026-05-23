@@ -518,22 +518,30 @@ export default function App() {
                                    <span className="material-symbols-outlined text-[12px] opacity-70 ml-1">info</span>
                                 </button>
                              </td>
-                             <td className="py-4 px-6 text-right">
-                                <div className="inline-block bg-surface-container px-3 py-1 rounded text-sm font-semibold text-on-surface">
-                                   {formatMoney(item.hargaPartai)} {item.hargaPartaiSatuan}
-                                </div>
-                             </td>
-                             <td className="py-4 px-6 text-right">
-                                {item.hargaEcer ? (
-                                   <div className="inline-block bg-primary-fixed/30 px-3 py-1 rounded text-sm font-semibold text-primary">
-                                      {formatMoney(item.hargaEcer)} {item.hargaEcerSatuan}
-                                   </div>
-                                ) : (
-                                   <div className="inline-block bg-surface px-3 py-1 rounded text-sm font-medium text-on-surface-variant border border-surface-variant">
-                                      -
-                                   </div>
-                                )}
-                             </td>
+                             <td className="py-4 px-6 text-right align-middle">
+                                 {/* Harga Partai */}
+                                 <div className="inline-flex items-baseline bg-surface-container px-3 py-1.5 rounded-md text-sm font-bold text-on-surface whitespace-nowrap">
+                                    {formatMoney(item.hargaPartai)}
+                                    <span className="text-xs font-semibold ml-1 opacity-70">
+                                       {item.hargaPartaiSatuan}
+                                    </span>
+                                 </div>
+                              </td>
+                              <td className="py-4 px-6 text-right align-middle">
+                                 {/* Harga Ecer */}
+                                 {item.hargaEcer ? (
+                                    <div className="inline-flex items-baseline px-3 py-1.5 text-sm font-bold text-primary whitespace-nowrap">
+                                       {formatMoney(item.hargaEcer)}
+                                       <span className="text-xs font-semibold ml-1 opacity-80">
+                                          {item.hargaEcerSatuan}
+                                       </span>
+                                    </div>
+                                 ) : (
+                                    <div className="inline-flex items-center justify-center w-8 h-8 rounded border border-outline-variant/40 bg-surface text-sm font-medium text-on-surface-variant">
+                                       -
+                                    </div>
+                                 )}
+                              </td>
                           </tr>
                        ))}
                     </tbody>
