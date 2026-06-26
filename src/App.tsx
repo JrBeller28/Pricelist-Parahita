@@ -519,14 +519,20 @@ export default function App() {
                                 </button>
                              </td>
                              <td className="py-4 px-6 text-right align-middle">
-                                 {/* Harga Partai */}
-                                 <div className="inline-flex items-baseline bg-surface-container px-3 py-1.5 rounded-md text-sm font-bold text-on-surface whitespace-nowrap">
-                                    {formatMoney(item.hargaPartai)}
-                                    <span className="text-xs font-semibold ml-1 opacity-70">
-                                       {item.hargaPartaiSatuan}
-                                    </span>
-                                 </div>
-                              </td>
+                                   {/* Harga Partai */}
+                                   {item.hargaPartai ? (
+                                      <div className="inline-flex items-baseline bg-surface-container px-3 py-1.5 rounded-md text-sm font-bold text-on-surface whitespace-nowrap">
+                                         {formatMoney(item.hargaPartai)}
+                                         <span className="text-xs font-semibold ml-1 opacity-70">
+                                            {item.hargaPartaiSatuan}
+                                         </span>
+                                      </div>
+                                   ) : (
+                                      <div className="inline-flex items-center justify-center w-8 h-8 rounded border border-outline-variant/40 bg-surface text-sm font-medium text-on-surface-variant">
+                                         -
+                                      </div>
+                                   )}
+                                </td>
                               <td className="py-4 px-6 text-right align-middle">
                                  {/* Harga Ecer */}
                                  {item.hargaEcer ? (
